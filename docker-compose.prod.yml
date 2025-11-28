@@ -1,0 +1,14 @@
+version: '3.7'
+
+services:
+
+  aut_dashboard_prod:
+    container_name: aut_dashboard_prod
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      - '.:/app'
+      - '/app/node_modules'
+    ports:
+      - '3333:80'

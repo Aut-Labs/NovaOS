@@ -1,0 +1,35 @@
+name: Deployment Dev
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build-and-deploy:
+    name: Build and Deployment
+    runs-on: ubuntu-20.04
+    permissions:
+      packages: write
+      contents: read
+      attestations: write
+    steps:
+      # Deploy to Server
+      - name: SSH & Deploy
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.TESTNET_FRONTEND_HOST }}
+          username: ${{ secrets.SSH_USERNAME }}
+          key: ${{ secrets.FRONTEND_SSH_KEY }}
+          script: |
+            #!/usr/bin/env bash
+
+            cd HubOS
+            sudo git checkout main;
+            sudo git pull origin main;
+
+            sudo docker-compose stop hubos_main
+            sudo docker rmi $(sudo docker images -f "dangling=true" -q) || true
+            sudo docker-compose up --build hubos_main -d
+
+            exit 0;
